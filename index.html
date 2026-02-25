@@ -3,28 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST</title>
+    <title>Kasse</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f4f4f4; color: #333; }
+        
+        /* Das Menü: Einfach untereinander für maximale Kompatibilität */
+        .item-list { 
+            display: block; 
+            margin-bottom: 250px; /* Platz für den festen Kasten unten */
+        }
+
+        .item-button { 
+            background: white; 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .item-button:active { background: #e0e0e0; }
+        .price-tag { color: #2e7d32; font-weight: bold; }
+
+        /* Der Kassenbereich unten (fest am Bildschirm) */
+        #checkout { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border-top: 3px solid #333; 
+            padding: 15px; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        }
+
+        #cart-display { 
+            max-height: 80px; 
+            overflow-y: auto; 
+            font-size: 0.9rem; 
+            margin-bottom: 10px; 
+            border-bottom: 1px solid #eee;
+        }
+
+        .row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
+        .total { font-size: 1.6rem; font-weight: bold; }
+        input { width: 100px; font-size: 1.2rem; padding: 5px; text-align: right; }
+        
+        button.reset { 
+            width: 100%; background: #d32f2f; color: white; border: none; 
+            padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>KASSEN-TEST</h1>
-    <p>Wenn du das hier lesen kannst und scrollen kannst, funktioniert es!</p>
-    
-    <div id="produkte">
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 1</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 2</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 3</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 4</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 5</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 6</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 7</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 8</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 9</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 10</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 11</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 12</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 13</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 14</button>
-        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 15</button>
+
+    <h2>Kuchentheke</h2>
+    <div class="item-list" id="menu"></div>
+
+    <div id="checkout">
+        <div id="cart-display" id="cart">Warenkorb leer</div>
+        
+        <div class="row">
+            <strong>GESAMT:</strong>
+            <span class="total"><span id="total-val">0</span> ¥</span>
+        </div>
+        <div class="row">
+            <span>Gegeben:</span>
+            <input type="number" id="cash" placeholder="0" oninput="rechnen()">
+        </div>
+        <div class="row">
+            <span>Rückgeld:</span>
+            <strong id="change" style="color:#2e7d32; font-size:1.4rem;">0 ¥</strong>
+        </div>
+        <button class="reset" onclick="leeren()">NÄCHSTER KUNDE</button>
     </div>
+
+<script>
+    // DEINE PRODUKTE (Einfach Zeilen kopieren für mehr Artikel)
+    const produkte = [
+        { id: 1, name: "Linzertorte", preis: 400 },
+        { id: 2, name: "Nusstorte", preis: 550 },
+        { id: 3, name: "Apfelstrudel", preis: 500 },
+        { id: 4, name: "Kaffee", preis: 500 },
+        { id: 5, name: "Cantuccini", preis: 250 },
+        { id: 6, name: "MomoEis", preis: 700 }
+    ];
+
+    let warenkorb = {};
+    let summe = 0;
+
+    function zeigeMenu() {
+        const div = document.getElementById('menu');
+        produkte.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+            const b = document.createElement('button');
+            b.className = 'item-button';
+            b.innerHTML = `<span>${p.name}</span><span class="price-tag">${p.preis} ¥</span>`;
+            b.onclick = () => hinzufuegen(p);
+            div.appendChild(b);
+        });
+    }
+
+    function hinzufuegen(p) {
+        if(warenkorb[p.id]) warenkorb[p.id].anzahl++;
+        else warenkorb[p.id] = { name: p.name, preis: p.preis, anzahl: 1 };
+        aktualisieren();
+    }
+
+    function aktualisieren() {
+        const cDiv = document.getElementById('cart-display');
+        cDiv.innerHTML = '';
+        summe = 0;
+        for(let id in warenkorb) {
+            const item = warenkorb[id];
+            summe += item.preis * item.anzahl;
+            cDiv.innerHTML += `<div>${item.anzahl}x ${item.name} (${item.preis * item.anzahl} ¥)</div>`;
+        }
+        document.getElementById('total-val').innerText = summe;
+        rechnen();
+    }
+
+    function rechnen() {
+        const gegeben = document.getElementById('cash').value;
+        const ausgabe = document.getElementById('change');
+        if(!gegeben || gegeben == 0) ausgabe.innerText = "0 ¥";
+        else ausgabe.innerText = (gegeben - summe) + " ¥";
+    }
+
+    function leeren() {
+        if(confirm("Neue Bestellung?")) {
+            warenkorb = {};
+            document.getElementById('cash').value = '';
+            aktualisieren();
+            window.scrollTo(0,0);
+        }
+    }
+
+    zeigeMenu();
+</script>
 </body>
 </html>
