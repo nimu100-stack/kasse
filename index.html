@@ -2,13 +2,13 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kasse</title>
     <style>
         :root { --accent: #2e7d32; --warn: #b71c1c; --brown: #3e2723; }
         body { font-family: sans-serif; margin: 0; padding: 0; background: #e0e0e0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .tabs { display: flex; background: var(--brown); position: sticky; top: 0; z-index: 110; }
+        .tabs { display: flex; background: var(--brown); position: sticky; top: 0; z-index: 110; flex-shrink: 0; }
         .tab { flex: 1; padding: 15px; text-align: center; color: white; font-weight: bold; cursor: pointer; border-bottom: 5px solid transparent; font-size: 1.1rem; }
         .tab.active { border-bottom: 5px solid #fff; background: rgba(255,255,255,0.2); }
 
@@ -17,8 +17,11 @@
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
             gap: 10px; 
             padding: 12px;
-            padding-bottom: 350px; 
+            /* Extra viel Platz unten, damit die Kasse nichts verdeckt */
+            padding-bottom: 380px; 
             overflow-y: auto;
+            flex-grow: 1;
+            -webkit-overflow-scrolling: touch;
         }
 
         .card { 
@@ -29,19 +32,8 @@
         }
         .card:active { background: #bbb; }
         
-        /* SCHRIFT DEUTLICH GRÖSSER */
-        .card strong { 
-            font-size: 1rem; 
-            font-weight: 900; 
-            margin-bottom: 5px; 
-            color: #000;
-            line-height: 1.1;
-        }
-        .card span { 
-            color: var(--accent); 
-            font-weight: bold; 
-            font-size: 0.95rem; 
-        }
+        .card strong { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #000; line-height: 1.1; }
+        .card span { color: var(--accent); font-weight: bold; font-size: 0.95rem; }
 
         #checkout-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; 
@@ -125,6 +117,8 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
         renderMenu();
+        // Springt nach oben beim Tab-Wechsel
+        document.getElementById('menu').scrollTop = 0;
     }
 
     function renderMenu() {
