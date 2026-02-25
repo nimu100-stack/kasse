@@ -2,133 +2,85 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasse</title>
     <style>
-        :root {
-            --primary: #6d4c41;
-            --accent: #2e7d32;
-            --bg: #f8f9fa;
-            --warn: #d32f2f;
-        }
+        :root { --accent: #2e7d32; --warn: #d32f2f; }
+        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f0f0f0; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        h2 { text-align: center; color: #5d4037; margin-bottom: 10px; }
 
-        html, body { 
-            height: 100%; 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background: var(--bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        
-        main { 
-            display: flex; 
-            height: 100vh; 
-            width: 100vw;
-            flex-direction: row;
-        }
-        
-        /* Linke Seite: Artikelauswahl */
+        /* Kachel-Layout */
         #menu { 
-            flex: 2; 
-            padding: 15px; 
-            overflow-y: auto; 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-            gap: 12px; 
-            align-content: start;
-            -webkit-overflow-scrolling: touch;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+            gap: 10px; 
+            margin-bottom: 280px; /* Platz für Kasse unten */
         }
 
-        .item-card { 
+        .card { 
             background: white; border: none; padding: 15px 5px; text-align: center; 
-            border-radius: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; justify-content: center; min-height: 100px;
-            transition: transform 0.1s;
+            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; justify-content: center; min-height: 90px;
+            cursor: pointer;
         }
-        .item-card:active { background: #efebe9; transform: scale(0.95); }
-        .item-card strong { font-size: 1rem; color: #333; margin-bottom: 5px; }
-        .price { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
+        .card:active { background: #e0e0e0; transform: scale(0.95); }
+        .card strong { font-size: 0.9rem; margin-bottom: 5px; }
+        .card span { color: var(--accent); font-weight: bold; }
 
-        /* Rechte Seite: Warenkorb */
-        #sidebar { 
-            flex: 1; 
-            max-width: 380px; 
-            background: white; 
-            border-left: 2px solid #ddd; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%;
+        /* Feste Kasse unten */
+        #checkout-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: white; border-top: 3px solid #333; padding: 15px; 
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
         }
 
-        #cart-items { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 10px;
-            -webkit-overflow-scrolling: touch;
+        /* Warenkorb-Liste im Kasten */
+        #cart { 
+            max-height: 100px; overflow-y: auto; 
+            margin-bottom: 10px; border-bottom: 1px solid #eee;
         }
-
         .cart-item { 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5px; border-bottom: 1px solid #eee; font-size: 1.1rem;
+            display: flex; justify-content: space-between; 
+            padding: 8px 0; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9;
         }
+        .delete-hint { font-size: 0.7rem; color: #999; text-align: right; }
 
-        /* Abrechnungsbereich unten */
-        .checkout-area { 
-            background: #fff;
-            border-top: 3px solid #333; 
-            padding: 20px; 
-        }
-
-        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .total-amount { font-size: 2.2rem; font-weight: bold; color: #000; }
-        .input-pay { width: 120px; padding: 10px; font-size: 1.4rem; text-align: right; border: 2px solid #ccc; border-radius: 8px; }
-        .change-display { font-size: 1.8rem; color: var(--accent); font-weight: bold; }
-        .change-negative { color: var(--warn); font-size: 1.2rem; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
+        .total { font-size: 1.8rem; font-weight: bold; }
+        input { width: 100px; font-size: 1.3rem; padding: 5px; text-align: right; border: 1px solid #ccc; }
         
-        button.clear { 
+        button.reset { 
             width: 100%; background: var(--warn); color: white; border: none; 
-            padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Mobile Ansicht für Handys (Firefox/Chrome Android) */
-        @media (max-width: 700px) {
-            main { flex-direction: column; }
-            #menu { flex: 1.4; height: 60vh; border-bottom: 2px solid #ddd; } 
-            #sidebar { flex: 1; height: 40vh; max-width: 100%; border-left: none; }
-            .total-amount { font-size: 1.8rem; }
+            padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-<main>
+    <h2>Kuchentheke</h2>
     <div id="menu"></div>
-    <aside id="sidebar">
-        <div id="cart-items"></div>
-        <div class="checkout-area">
-            <div class="row">
-                <strong>GESAMT:</strong>
-                <span class="total-amount"><span id="total-price">0</span> ¥</span>
-            </div>
-            <div class="row">
-                <span>Gegeben:</span>
-                <input type="number" id="cash-given" class="input-pay" placeholder="0" oninput="calculateChange()">
-            </div>
-            <div class="row">
-                <span>Rückgeld:</span>
-                <span id="change-amount" class="change-display">0 ¥</span>
-            </div>
-            <button class="clear" onclick="clearCart()">NÄCHSTER KUNDE (RESET)</button>
+
+    <div id="checkout-bar">
+        <div class="delete-hint">Tippen zum Löschen</div>
+        <div id="cart"></div>
+        
+        <div class="row">
+            <strong>GESAMT:</strong>
+            <span class="total"><span id="total-val">0</span> ¥</span>
         </div>
-    </aside>
-</main>
+        <div class="row">
+            <span>Gegeben:</span>
+            <input type="number" id="cash" placeholder="0" oninput="calc()">
+        </div>
+        <div class="row">
+            <span>Rückgeld:</span>
+            <strong id="change" style="color:var(--accent); font-size:1.6rem;">0 ¥</strong>
+        </div>
+        <button class="reset" onclick="clr()">NÄCHSTER KUNDE</button>
+    </div>
 
 <script>
-    // LISTE DER PRODUKTE (Hier kannst du die restlichen 24 ergänzen)
     const products = [
         { id: 1, name: "Linzertorte", price: 400 },
         { id: 2, name: "Nusstorte", price: 550 },
@@ -139,74 +91,67 @@
     ];
 
     let cart = {};
-    let currentTotal = 0;
+    let total = 0;
 
-    function initMenu() {
-        const menuDiv = document.getElementById('menu');
-        menuDiv.innerHTML = '';
-        // Sortiert die Liste alphabetisch
-        products.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'item-card';
-            card.innerHTML = `<strong>${p.name}</strong><span class="price">${p.price} ¥</span>`;
-            card.onclick = () => addToCart(p);
-            menuDiv.appendChild(card);
+    function renderMenu() {
+        const div = document.getElementById('menu');
+        div.innerHTML = '';
+        products.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+            const c = document.createElement('div');
+            c.className = 'card';
+            c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
+            c.onclick = () => add(p);
+            div.appendChild(c);
         });
     }
 
-    function addToCart(product) {
-        if (cart[product.id]) { cart[product.id].qty++; } 
-        else { cart[product.id] = { name: product.name, price: product.price, qty: 1 }; }
-        renderCart();
+    function add(p) {
+        if(cart[p.id]) cart[p.id].qty++;
+        else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
+        update();
     }
 
-    function removeFromCart(id) {
-        if (cart[id].qty > 1) { cart[id].qty--; } 
-        else { delete cart[id]; }
-        renderCart();
+    // EINZELNE POSTEN LÖSCHEN
+    function remove(id) {
+        if(cart[id].qty > 1) cart[id].qty--;
+        else delete cart[id];
+        update();
     }
 
-    function renderCart() {
-        const cartList = document.getElementById('cart-items');
-        cartList.innerHTML = '';
-        currentTotal = 0;
-        for (let id in cart) {
+    function update() {
+        const cDiv = document.getElementById('cart');
+        cDiv.innerHTML = '';
+        total = 0;
+        for(let id in cart) {
             const item = cart[id];
-            const div = document.createElement('div');
-            div.className = 'cart-item';
-            div.innerHTML = `<span>${item.qty}x ${item.name}</span> <span>${item.price * item.qty} ¥</span>`;
-            div.onclick = () => removeFromCart(id);
-            cartList.appendChild(div);
-            currentTotal += item.price * item.qty;
+            total += item.price * item.qty;
+            const r = document.createElement('div');
+            r.className = 'cart-item';
+            r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
+            r.onclick = () => remove(id); // Klick löscht den Artikel
+            cDiv.appendChild(r);
         }
-        document.getElementById('total-price').innerText = currentTotal.toLocaleString('ja-JP');
-        calculateChange();
+        document.getElementById('total-val').innerText = total;
+        calc();
     }
 
-    function calculateChange() {
-        const given = parseFloat(document.getElementById('cash-given').value) || 0;
-        const changeDisplay = document.getElementById('change-amount');
-        const change = given - currentTotal;
-        if (given === 0) { 
-            changeDisplay.innerText = "0 ¥"; 
-            changeDisplay.className = "change-display";
-        } else if (change < 0) { 
-            changeDisplay.innerText = "Noch " + Math.abs(change) + " ¥"; 
-            changeDisplay.className = "change-display change-negative"; 
-        } else { 
-            changeDisplay.innerText = change.toLocaleString('ja-JP') + " ¥"; 
-            changeDisplay.className = "change-display";
-        }
+    function calc() {
+        const cash = document.getElementById('cash').value;
+        const out = document.getElementById('change');
+        if(!cash || cash <= 0) out.innerText = "0 ¥";
+        else out.innerText = (cash - total) + " ¥";
     }
 
-    function clearCart() {
-        if(confirm("Warenkorb löschen?")) {
+    function clr() {
+        if(confirm("Warenkorb leeren?")) {
             cart = {};
-            document.getElementById('cash-given').value = '';
-            renderCart();
+            document.getElementById('cash').value = '';
+            update();
+            window.scrollTo(0,0);
         }
     }
-    initMenu();
+
+    renderMenu();
 </script>
 </body>
 </html>
