@@ -1,148 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kasse</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f4f4f4; color: #333; }
-        
-        /* Das Menü: Einfach untereinander für maximale Kompatibilität */
-        .item-list { 
-            display: block; 
-            margin-bottom: 250px; /* Platz für den festen Kasten unten */
+        :root {
+            --primary: #6d4c41;
+            --accent: #2e7d32;
+            --bg: #f8f9fa;
+            --warn: #d32f2f;
         }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        .item-button { 
-            background: white; 
-            border: 1px solid #ccc; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-radius: 8px; 
+        html, body { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        main { 
             display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            width: 100%;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            height: 100vh; 
+            width: 100vw;
+            flex-direction: row;
         }
-        .item-button:active { background: #e0e0e0; }
-        .price-tag { color: #2e7d32; font-weight: bold; }
-
-        /* Der Kassenbereich unten (fest am Bildschirm) */
-        #checkout { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background: white; 
-            border-top: 3px solid #333; 
-            padding: 15px; 
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
-        }
-
-        #cart-display { 
-            max-height: 80px; 
-            overflow-y: auto; 
-            font-size: 0.9rem; 
-            margin-bottom: 10px; 
-            border-bottom: 1px solid #eee;
-        }
-
-        .row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
-        .total { font-size: 1.6rem; font-weight: bold; }
-        input { width: 100px; font-size: 1.2rem; padding: 5px; text-align: right; }
         
-        button.reset { 
-            width: 100%; background: #d32f2f; color: white; border: none; 
-            padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 10px;
+        /* Linke Seite: Artikelauswahl */
+        #menu { 
+            flex: 2; 
+            padding: 15px; 
+            overflow-y: auto; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 12px; 
+            align-content: start;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .item-card { 
+            background: white; border: none; padding: 15px 5px; text-align: center; 
+            border-radius: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; justify-content: center; min-height: 100px;
+            transition: transform 0.1s;
+        }
+        .item-card:active { background: #efebe9; transform: scale(0.95); }
+        .item-card strong { font-size: 1rem; color: #333; margin-bottom: 5px; }
+        .price { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
+
+        /* Rechte Seite: Warenkorb */
+        #sidebar { 
+            flex: 1; 
+            max-width: 380px; 
+            background: white; 
+            border-left: 2px solid #ddd; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%;
+        }
+
+        #cart-items { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cart-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 5px; border-bottom: 1px solid #eee; font-size: 1.1rem;
+        }
+
+        /* Abrechnungsbereich unten */
+        .checkout-area { 
+            background: #fff;
+            border-top: 3px solid #333; 
+            padding: 20px; 
+        }
+
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .total-amount { font-size: 2.2rem; font-weight: bold; color: #000; }
+        .input-pay { width: 120px; padding: 10px; font-size: 1.4rem; text-align: right; border: 2px solid #ccc; border-radius: 8px; }
+        .change-display { font-size: 1.8rem; color: var(--accent); font-weight: bold; }
+        .change-negative { color: var(--warn); font-size: 1.2rem; }
+        
+        button.clear { 
+            width: 100%; background: var(--warn); color: white; border: none; 
+            padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Mobile Ansicht für Handys (Firefox/Chrome Android) */
+        @media (max-width: 700px) {
+            main { flex-direction: column; }
+            #menu { flex: 1.4; height: 60vh; border-bottom: 2px solid #ddd; } 
+            #sidebar { flex: 1; height: 40vh; max-width: 100%; border-left: none; }
+            .total-amount { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
-    <h2>Kuchentheke</h2>
-    <div class="item-list" id="menu"></div>
-
-    <div id="checkout">
-        <div id="cart-display" id="cart">Warenkorb leer</div>
-        
-        <div class="row">
-            <strong>GESAMT:</strong>
-            <span class="total"><span id="total-val">0</span> ¥</span>
+<main>
+    <div id="menu"></div>
+    <aside id="sidebar">
+        <div id="cart-items"></div>
+        <div class="checkout-area">
+            <div class="row">
+                <strong>GESAMT:</strong>
+                <span class="total-amount"><span id="total-price">0</span> ¥</span>
+            </div>
+            <div class="row">
+                <span>Gegeben:</span>
+                <input type="number" id="cash-given" class="input-pay" placeholder="0" oninput="calculateChange()">
+            </div>
+            <div class="row">
+                <span>Rückgeld:</span>
+                <span id="change-amount" class="change-display">0 ¥</span>
+            </div>
+            <button class="clear" onclick="clearCart()">NÄCHSTER KUNDE (RESET)</button>
         </div>
-        <div class="row">
-            <span>Gegeben:</span>
-            <input type="number" id="cash" placeholder="0" oninput="rechnen()">
-        </div>
-        <div class="row">
-            <span>Rückgeld:</span>
-            <strong id="change" style="color:#2e7d32; font-size:1.4rem;">0 ¥</strong>
-        </div>
-        <button class="reset" onclick="leeren()">NÄCHSTER KUNDE</button>
-    </div>
+    </aside>
+</main>
 
 <script>
-    // DEINE PRODUKTE (Einfach Zeilen kopieren für mehr Artikel)
-    const produkte = [
-        { id: 1, name: "Linzertorte", preis: 400 },
-        { id: 2, name: "Nusstorte", preis: 550 },
-        { id: 3, name: "Apfelstrudel", preis: 500 },
-        { id: 4, name: "Kaffee", preis: 500 },
-        { id: 5, name: "Cantuccini", preis: 250 },
-        { id: 6, name: "MomoEis", preis: 700 }
+    // LISTE DER PRODUKTE (Hier kannst du die restlichen 24 ergänzen)
+    const products = [
+        { id: 1, name: "Linzertorte", price: 400 },
+        { id: 2, name: "Nusstorte", price: 550 },
+        { id: 3, name: "Apfelstrudel", price: 500 },
+        { id: 4, name: "Kaffee", price: 500 },
+        { id: 5, name: "Cantuccini", price: 250 },
+        { id: 6, name: "MomoEis", price: 700 }
     ];
 
-    let warenkorb = {};
-    let summe = 0;
+    let cart = {};
+    let currentTotal = 0;
 
-    function zeigeMenu() {
-        const div = document.getElementById('menu');
-        produkte.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
-            const b = document.createElement('button');
-            b.className = 'item-button';
-            b.innerHTML = `<span>${p.name}</span><span class="price-tag">${p.preis} ¥</span>`;
-            b.onclick = () => hinzufuegen(p);
-            div.appendChild(b);
+    function initMenu() {
+        const menuDiv = document.getElementById('menu');
+        menuDiv.innerHTML = '';
+        // Sortiert die Liste alphabetisch
+        products.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.innerHTML = `<strong>${p.name}</strong><span class="price">${p.price} ¥</span>`;
+            card.onclick = () => addToCart(p);
+            menuDiv.appendChild(card);
         });
     }
 
-    function hinzufuegen(p) {
-        if(warenkorb[p.id]) warenkorb[p.id].anzahl++;
-        else warenkorb[p.id] = { name: p.name, preis: p.preis, anzahl: 1 };
-        aktualisieren();
+    function addToCart(product) {
+        if (cart[product.id]) { cart[product.id].qty++; } 
+        else { cart[product.id] = { name: product.name, price: product.price, qty: 1 }; }
+        renderCart();
     }
 
-    function aktualisieren() {
-        const cDiv = document.getElementById('cart-display');
-        cDiv.innerHTML = '';
-        summe = 0;
-        for(let id in warenkorb) {
-            const item = warenkorb[id];
-            summe += item.preis * item.anzahl;
-            cDiv.innerHTML += `<div>${item.anzahl}x ${item.name} (${item.preis * item.anzahl} ¥)</div>`;
+    function removeFromCart(id) {
+        if (cart[id].qty > 1) { cart[id].qty--; } 
+        else { delete cart[id]; }
+        renderCart();
+    }
+
+    function renderCart() {
+        const cartList = document.getElementById('cart-items');
+        cartList.innerHTML = '';
+        currentTotal = 0;
+        for (let id in cart) {
+            const item = cart[id];
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `<span>${item.qty}x ${item.name}</span> <span>${item.price * item.qty} ¥</span>`;
+            div.onclick = () => removeFromCart(id);
+            cartList.appendChild(div);
+            currentTotal += item.price * item.qty;
         }
-        document.getElementById('total-val').innerText = summe;
-        rechnen();
+        document.getElementById('total-price').innerText = currentTotal.toLocaleString('ja-JP');
+        calculateChange();
     }
 
-    function rechnen() {
-        const gegeben = document.getElementById('cash').value;
-        const ausgabe = document.getElementById('change');
-        if(!gegeben || gegeben == 0) ausgabe.innerText = "0 ¥";
-        else ausgabe.innerText = (gegeben - summe) + " ¥";
-    }
-
-    function leeren() {
-        if(confirm("Neue Bestellung?")) {
-            warenkorb = {};
-            document.getElementById('cash').value = '';
-            aktualisieren();
-            window.scrollTo(0,0);
+    function calculateChange() {
+        const given = parseFloat(document.getElementById('cash-given').value) || 0;
+        const changeDisplay = document.getElementById('change-amount');
+        const change = given - currentTotal;
+        if (given === 0) { 
+            changeDisplay.innerText = "0 ¥"; 
+            changeDisplay.className = "change-display";
+        } else if (change < 0) { 
+            changeDisplay.innerText = "Noch " + Math.abs(change) + " ¥"; 
+            changeDisplay.className = "change-display change-negative"; 
+        } else { 
+            changeDisplay.innerText = change.toLocaleString('ja-JP') + " ¥"; 
+            changeDisplay.className = "change-display";
         }
     }
 
-    zeigeMenu();
+    function clearCart() {
+        if(confirm("Warenkorb löschen?")) {
+            cart = {};
+            document.getElementById('cash-given').value = '';
+            renderCart();
+        }
+    }
+    initMenu();
 </script>
 </body>
 </html>
