@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kasse IPAD Edition</title>
+    <style>
+        :root { --accent: #2e7d32; --warn: #b71c1c; --brown: #3e2723; --stats: #1976d2; }
+        body { 
+            font-family: sans-serif; margin: 0; padding: 0; background: #dcdcdc; 
+            display: flex; height: 100vh; overflow: hidden; 
+        }
+        
+        /* Linke Seite: Menü */
+        .left-panel { 
+            flex: 1; display: flex; flex-direction: column; border-right: 2px solid #999; 
+            background: #f0f0f0;
+        }
+        
+        /* Rechte Seite: Kasse */
+        .right-panel { 
+            width: 350px; background: white; display: flex; flex-direction: column; 
+            padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 10;
+        }
+
+        .tabs { display: flex; background: var(--brown); flex-shrink: 0; }
+        .tab { flex: 1; padding: 20px; text-align: center; color: white; font-weight: bold; cursor: pointer; border-bottom: 5px solid transparent; font-size: 1.2rem; }
+        .tab.active { border-bottom: 5px solid #fff; background: rgba(255,255,255,0.2); }
+
+        #menu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 15px; padding: 20px; overflow-y: auto; flex-grow: 1;
+        }
+
+        .card { 
+            background: white; border: 1px solid #aaa; padding: 15px 5px; text-align: center; 
+            border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; justify-content: center; 
+            aspect-ratio: 1/1; cursor: pointer;
+        }
+        .card:active { background: #bbb; transform: scale(0.98); }
+        .card strong { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; color: #000; line-height: 1.2; }
+        .card span { color: var(--accent); font-weight: bold; font-size: 1rem; }
+
+        /* Kassen-Elemente rechts */
+        #cart { flex-grow: 1; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #f5f5f5; }
+        
+        .total-row { font-size: 2.5rem; font-weight: 900; display: flex; justify-content: space-between; margin: 15px 0; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 1.3rem; }
+        input { width: 130px; font-size: 1.8rem; padding: 10px; text-align: right; border: 2px solid #333; border-radius: 8px; font-weight: bold; }
+        
+        .change-row { font-size: 2rem; color: var(--accent); font-weight: bold; text-align: right; margin-bottom: 20px; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        button { border: none; padding: 20px; font-weight: bold; border-radius: 12px; cursor: pointer; font-size: 1.3rem; }
+        .reset { background: var(--warn); color: white; }
+        .stats-btn { background: var(--stats); color: white; }
+
+        #stats-overlay { position: fixed; inset: 0; background: white; z-index: 200; display: none; padding: 40px; overflow-y: auto; }
+        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('Kuchen', this)">KUCHEN</div>
+            <div class="tab" onclick="switchTab('Getränke', this)">GETRÄNKE</div>
+        </div>
+        <div id="menu"></div>
+    </div>
+
+    <div class="right-panel">
+        <h2 style="margin-top:0">Warenkorb</h2>
+        <div id="cart"></div>
+        
+        <div class="total-row">
+            <span>TOTAL:</span>
+            <span><span id="total-val">0</span> ¥</span>
+        </div>
+        
+        <div class="input-row">
+            <span>Gegeben:</span>
+            <input type="number" id="cash" placeholder="0" oninput="calc()">
+        </div>
+        
+        <div class="change-row">
+            Rückgeld: <span id="change">0 ¥</span>
+        </div>
+
+        <div class="btn-group">
+            <button class="reset" onclick="completeSale()">NÄCHSTER KUNDE</button>
+            <button class="stats-btn" onclick="showStats()">📊 TAGESSTATISTIK</button>
+        </div>
+    </div>
+
+    <div id="stats-overlay">
+        <h2>📊 Tagesstatistik (iPad)</h2>
+        <div id="stats-summary" style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 20px; font-size: 1.3rem;"></div>
+        <h3>Verkaufte Artikel:</h3>
+        <div id="stats-items"></div>
+        <button onclick="closeStats()" style="background: #333; color: white; width: 100%; margin-top: 40px; padding: 20px;">ZURÜCK ZUR KASSE</button>
+        <button onclick="clearStats()" style="background: transparent; color: red; width: 100%; margin-top: 20px; border: 1px solid red;">Daten löschen</button>
+    </div>
+
+<script>
+    // [Die Logik bleibt identisch zur Handy-Version, nur die Darstellung ändert sich]
+    const products = [
+        { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
+        { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
+        { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
+        { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
+        { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
+        { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
+        { id: 9, name: "Gebr. Mandeln", price: 400, cat: "Kuchen" },
+        { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
+        { id: 11, name: "イチゴショコラ", price: 400, cat: "Kuchen" },
+        { id: 12, name: "オレンジショコラ", price: 400, cat: "Kuchen" },
+        { id: 13, name: "Schokokuchen", price: 400, cat: "Kuchen" },
+        { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
+        { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
+        { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke" },
+        { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke" },
+        { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke" },
+        { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke" },
+        { id: 19, name: "Hot Choko", price: 700, cat: "Getränke" },
+        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
+        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
+        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
+        { id: 23, name: "Carpis", price: 300, cat: "Getränke" }
+    ];
+
+    let cart = {};
+    let total = 0;
+    let currentCat = "Kuchen";
+
+    function switchTab(cat, el) {
+        currentCat = cat;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderMenu();
+    }
+
+    function renderMenu() {
+        const div = document.getElementById('menu');
+        div.innerHTML = '';
+        products.filter(p => p.cat === currentCat).sort((a, b) => a.price - b.price).forEach(p => {
+            const c = document.createElement('div');
+            c.className = 'card';
+            c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
+            c.onclick = () => add(p);
+            div.appendChild(c);
+        });
+    }
+
+    function add(p) {
+        if(cart[p.id]) cart[p.id].qty++;
+        else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
+        update();
+    }
+
+    function remove(id) {
+        if(cart[id].qty > 1) cart[id].qty--;
+        else delete cart[id];
+        update();
+    }
+
+    function update() {
+        const cDiv = document.getElementById('cart');
+        cDiv.innerHTML = '';
+        total = 0;
+        for(let id in cart) {
+            const item = cart[id];
+            total += item.price * item.qty;
+            const r = document.createElement('div');
+            r.className = 'cart-item';
+            r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
+            r.onclick = () => remove(id);
+            cDiv.appendChild(r);
+        }
+        document.getElementById('total-val').innerText = total;
+        calc();
+    }
+
+    function calc() {
+        const cash = document.getElementById('cash').value;
+        const out = document.getElementById('change');
+        out.innerText = (cash && cash > 0) ? (cash - total) + " ¥" : "0 ¥";
+    }
+
+    function completeSale() {
+        if (total <= 0) return;
+        if(confirm("Verkauf abschließen?")) {
+            const sale = { timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) };
+            let history = JSON.parse(localStorage.getItem('sales_history') || '[]');
+            history.push(sale);
+            localStorage.setItem('sales_history', JSON.stringify(history));
+            cart = {};
+            document.getElementById('cash').value = '';
+            update();
+        }
+    }
+
+    function showStats() {
+        const history = JSON.parse(localStorage.getItem('sales_history') || '[]');
+        const today = new Date().toISOString().split('T')[0];
+        let dailyTotal = 0, count = 0, itemStats = {};
+
+        history.forEach(s => {
+            if(s.timestamp.startsWith(today)) {
+                dailyTotal += s.amount;
+                count++;
+                for(let id in s.items) {
+                    let item = s.items[id];
+                    itemStats[item.name] = (itemStats[item.name] || 0) + item.qty;
+                }
+            }
+        });
+
+        document.getElementById('stats-summary').innerHTML = `Kunden: ${count} | <strong>Umsatz: ${dailyTotal} ¥</strong>`;
+        let itemHTML = "";
+        Object.entries(itemStats).sort((a,b) => b[1] - a[1]).forEach(([name, qty]) => {
+            itemHTML += `<div class="stat-line"><span>${name}</span> <strong>${qty}x</strong></div>`;
+        });
+        document.getElementById('stats-items').innerHTML = itemHTML || "Keine Verkäufe.";
+        document.getElementById('stats-overlay').style.display = 'block';
+    }
+
+    function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
+    function clearStats() { if(confirm("Daten löschen?")) { localStorage.removeItem('sales_history'); showStats(); } }
+
+    renderMenu();
+</script>
+</body>
+</html>
