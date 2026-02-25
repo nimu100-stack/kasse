@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasse</title>
     <style>
-        :root { --accent: #2e7d32; --warn: #d32f2f; }
-        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f0f0f0; }
+        :root { --accent: #2e7d32; --warn: #d32f2f; --brown: #5d4037; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; flex-direction: column; height: 100vh; }
         
-        /* Kachel-Layout (Überschrift gelöscht für mehr Platz) */
+        /* Kategorie-Tabs */
+        .tabs { display: flex; background: var(--brown); position: sticky; top: 0; z-index: 110; }
+        .tab { flex: 1; padding: 15px; text-align: center; color: white; font-weight: bold; cursor: pointer; border-bottom: 4px solid transparent; }
+        .tab.active { border-bottom: 4px solid white; background: rgba(255,255,255,0.1); }
+
+        /* Kachel-Layout */
         #menu { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
             gap: 10px; 
-            margin-bottom: 280px; 
-            padding-top: 5px;
+            padding: 15px;
+            padding-bottom: 300px; /* Platz für Kasse */
+            overflow-y: auto;
         }
 
         .card { 
             background: white; border: none; padding: 15px 5px; text-align: center; 
             border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; justify-content: center; min-height: 95px;
-            cursor: pointer;
         }
         .card:active { background: #e0e0e0; transform: scale(0.95); }
         .card strong { font-size: 0.9rem; margin-bottom: 5px; }
@@ -31,39 +36,31 @@
         #checkout-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: white; border-top: 3px solid #333; padding: 15px; 
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
-            z-index: 100;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2); z-index: 100;
         }
 
-        #cart { 
-            max-height: 100px; overflow-y: auto; 
-            margin-bottom: 10px; border-bottom: 1px solid #eee;
-        }
-        .cart-item { 
-            display: flex; justify-content: space-between; 
-            padding: 8px 0; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9;
-        }
-        .delete-hint { font-size: 0.7rem; color: #999; text-align: right; margin-bottom: 5px; }
+        #cart { max-height: 80px; overflow-y: auto; margin-bottom: 10px; border-bottom: 1px solid #eee; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.95rem; }
 
         .row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
         .total { font-size: 1.8rem; font-weight: bold; }
         input { width: 100px; font-size: 1.3rem; padding: 5px; text-align: right; border: 1px solid #ccc; border-radius: 4px; }
         
-        button.reset { 
-            width: 100%; background: var(--warn); color: white; border: none; 
-            padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px;
-            cursor: pointer;
-        }
+        button.reset { width: 100%; background: var(--warn); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px; }
     </style>
 </head>
 <body>
 
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('Kuchen', this)">Kuchen</div>
+        <div class="tab" onclick="switchTab('Getränke', this)">Getränke</div>
+    </div>
+
     <div id="menu"></div>
 
     <div id="checkout-bar">
-        <div class="delete-hint">Tippen zum Löschen</div>
+        <div style="font-size: 0.7rem; color: #999;">Tippen zum Löschen</div>
         <div id="cart"></div>
-        
         <div class="row">
             <strong>GESAMT:</strong>
             <span class="total"><span id="total-val">0</span> ¥</span>
@@ -80,28 +77,40 @@
     </div>
 
 <script>
+    // PRODUKTE MIT KATEGORIEN
     const products = [
-        { id: 1, name: "Linzertorte", price: 400 },
-        { id: 2, name: "Nusstorte", price: 550 },
-        { id: 3, name: "Apfelstrudel", price: 500 },
-        { id: 4, name: "Kaffee", price: 500 },
-        { id: 5, name: "Cantuccini", price: 250 },
-        { id: 6, name: "MomoEis", price: 700 }
+        { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
+        { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
+        { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
+        { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
+        { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" }
     ];
 
     let cart = {};
     let total = 0;
+    let currentCat = "Kuchen";
+
+    function switchTab(cat, el) {
+        currentCat = cat;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderMenu();
+    }
 
     function renderMenu() {
         const div = document.getElementById('menu');
         div.innerHTML = '';
-        products.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'card';
-            c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
-            c.onclick = () => add(p);
-            div.appendChild(c);
-        });
+        products
+            .filter(p => p.cat === currentCat)
+            .sort((a,b) => a.name.localeCompare(b.name))
+            .forEach(p => {
+                const c = document.createElement('div');
+                c.className = 'card';
+                c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
+                c.onclick = () => add(p);
+                div.appendChild(c);
+            });
     }
 
     function add(p) {
@@ -145,7 +154,6 @@
             cart = {};
             document.getElementById('cash').value = '';
             update();
-            window.scrollTo(0,0);
         }
     }
 
