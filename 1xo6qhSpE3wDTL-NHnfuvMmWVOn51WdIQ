@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kasse</title>
+    <style>
+        :root {
+            --primary: #6d4c41;
+            --accent: #2e7d32;
+            --bg: #f8f9fa;
+            --warn: #d32f2f;
+        }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; background: var(--bg); overflow: hidden; }
+        
+        main { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Artikelauswahl */
+        #menu { 
+            flex: 2; padding: 10px; overflow-y: auto; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+            gap: 8px; align-content: start;
+        }
+        .item-card { 
+            background: white; border: none; padding: 12px 5px; text-align: center; 
+            border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; justify-content: center; min-height: 85px;
+        }
+        .item-card:active { background: #efebe9; transform: translateY(2px); }
+        .item-card strong { font-size: 0.9rem; color: #333; margin-bottom: 4px; }
+        .price { color: var(--accent); font-weight: bold; font-size: 1rem; }
+
+        /* Warenkorb / Sidebar */
+        #sidebar { 
+            flex: 1; max-width: 350px; background: white; 
+            border-left: 2px solid #ddd; padding: 15px; display: flex; flex-direction: column; 
+        }
+        #cart-items { flex: 1; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
+        .cart-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 5px; border-bottom: 1px solid #eee; font-size: 1rem;
+        }
+        .cart-item:active { background: #fff5f5; color: var(--warn); }
+        
+        /* Abrechnung unten */
+        .checkout-area { border-top: 2px solid #333; padding-top: 10px; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .total-amount { font-size: 1.8rem; font-weight: bold; }
+        .input-pay { width: 100px; padding: 8px; font-size: 1.2rem; text-align: right; border: 2px solid #ccc; border-radius: 5px; }
+        .change-display { font-size: 1.5rem; color: var(--accent); font-weight: bold; }
+        .change-negative { color: var(--warn); font-size: 1rem; }
+        
+        button.clear { 
+            width: 100%; background: var(--warn); color: white; border: none; 
+            padding: 15px; border-radius: 8px; font-size: 1rem; font-weight: bold; margin-top: 5px;
+        }
+
+        /* Mobile Optimierung: Warenkorb unter das Menü schieben */
+        @media (max-width: 600px) {
+            main { flex-direction: column; }
+            #sidebar { max-width: 100%; height: 50vh; border-left: none; border-top: 3px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <div id="menu"></div>
+    <aside id="sidebar">
+        <div id="cart-items"></div>
+        <div class="checkout-area">
+            <div class="row">
+                <strong>Gesamt:</strong>
+                <span class="total-amount"><span id="total-price">0</span> ¥</span>
+            </div>
+            <div class="row">
+                <span>Gegeben:</span>
+                <input type="number" id="cash-given" class="input-pay" placeholder="0" oninput="calculateChange()">
+            </div>
+            <div class="row">
+                <span>Rückgeld:</span>
+                <span id="change-amount" class="change-display">0 ¥</span>
+            </div>
+            <button class="clear" onclick="clearCart()">RESET / NÄCHSTER</button>
+        </div>
+    </aside>
+</main>
+
+<script>
+    const products = [
+        { id: 1, name: "Linzertorte", price: 400 },
+        { id: 2, name: "Nusstorte", price: 550 },
+        { id: 3, name: "Apfelstrudel", price: 500 },
+        { id: 4, name: "Kaffee", price: 500 },
+        { id: 5, name: "Cantuccini", price: 250 },
+        { id: 6, name: "MomoEis", price: 700 }
+    ];
+
+    let cart = {};
+    let currentTotal = 0;
+
+    function initMenu() {
+        const menuDiv = document.getElementById('menu');
+        products.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.innerHTML = `<strong>${p.name}</strong><span class="price">${p.price} ¥</span>`;
+            card.onclick = () => addToCart(p);
+            menuDiv.appendChild(card);
+        });
+    }
+
+    function addToCart(product) {
+        if (cart[product.id]) { cart[product.id].qty++; } 
+        else { cart[product.id] = { name: product.name, price: product.price, qty: 1 }; }
+        renderCart();
+    }
+
+    function removeFromCart(id) {
+        if (cart[id].qty > 1) { cart[id].qty--; } 
+        else { delete cart[id]; }
+        renderCart();
+    }
+
+    function renderCart() {
+        const cartList = document.getElementById('cart-items');
+        cartList.innerHTML = '';
+        currentTotal = 0;
+        for (let id in cart) {
+            const item = cart[id];
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `<span>${item.qty}x ${item.name}</span> <span>${item.price * item.qty} ¥</span>`;
+            div.onclick = () => removeFromCart(id);
+            cartList.appendChild(div);
+            currentTotal += item.price * item.qty;
+        }
+        document.getElementById('total-price').innerText = currentTotal.toLocaleString('ja-JP');
+        calculateChange();
+    }
+
+    function calculateChange() {
+        const given = parseFloat(document.getElementById('cash-given').value) || 0;
+        const changeDisplay = document.getElementById('change-amount');
+        const change = given - currentTotal;
+        if (given === 0) { changeDisplay.innerText = "0 ¥"; changeDisplay.className = "change-display"; }
+        else if (change < 0) { changeDisplay.innerText = "Offen: " + Math.abs(change) + " ¥"; changeDisplay.className = "change-display change-negative"; }
+        else { changeDisplay.innerText = change.toLocaleString('ja-JP') + " ¥"; changeDisplay.className = "change-display"; }
+    }
+
+    function clearCart() {
+        if(confirm("Neue Bestellung?")) {
+            cart = {};
+            document.getElementById('cash-given').value = '';
+            renderCart();
+        }
+    }
+    initMenu();
+</script>
+</body>
+</html>
