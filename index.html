@@ -19,7 +19,7 @@
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
             gap: 10px; 
             padding: 15px;
-            padding-bottom: 300px; /* Platz für Kasse */
+            padding-bottom: 300px; 
             overflow-y: auto;
         }
 
@@ -77,14 +77,22 @@
     </div>
 
 <script>
-    // PRODUKTE MIT KATEGORIEN
+    // DEINE AKTUALISIERTE PRODUKTLISTE
     const products = [
         { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
         { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
         { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
         { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
         { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
-        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" }
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
+        { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
+        { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
+        { id: 9, name: "Gebr. Mandeln", price: 400, cat: "Kuchen" },
+        { id: 10, name: "Cheeseburger cake", price: 450, cat: "Kuchen" },
+        { id: 11, name: "イチゴショコラ", price: 400, cat: "Kuchen" },
+        { id: 12, name: "オレンジショコラ", price: 400, cat: "Kuchen" },
+        { id: 13, name: "Schokoladekuchen", price: 400, cat: "Kuchen" },
+        { id: 14, name: "Orangette", price: 450, cat: "Kuchen" }
     ];
 
     let cart = {};
