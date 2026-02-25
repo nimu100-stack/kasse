@@ -8,12 +8,10 @@
         :root { --accent: #2e7d32; --warn: #d32f2f; --brown: #5d4037; }
         body { font-family: sans-serif; margin: 0; padding: 0; background: #f0f0f0; display: flex; flex-direction: column; height: 100vh; }
         
-        /* Kategorie-Tabs */
         .tabs { display: flex; background: var(--brown); position: sticky; top: 0; z-index: 110; }
         .tab { flex: 1; padding: 15px; text-align: center; color: white; font-weight: bold; cursor: pointer; border-bottom: 4px solid transparent; }
         .tab.active { border-bottom: 4px solid white; background: rgba(255,255,255,0.1); }
 
-        /* Kachel-Layout */
         #menu { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
@@ -32,7 +30,6 @@
         .card strong { font-size: 0.9rem; margin-bottom: 5px; }
         .card span { color: var(--accent); font-weight: bold; }
 
-        /* Feste Kasse unten */
         #checkout-bar { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: white; border-top: 3px solid #333; padding: 15px; 
@@ -46,7 +43,7 @@
         .total { font-size: 1.8rem; font-weight: bold; }
         input { width: 100px; font-size: 1.3rem; padding: 5px; text-align: right; border: 1px solid #ccc; border-radius: 4px; }
         
-        button.reset { width: 100%; background: var(--warn); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px; }
+        button.reset { width: 100%; background: var(--warn); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -77,14 +74,12 @@
     </div>
 
 <script>
-    // DEINE AKTUALISIERTE PRODUKTLISTE
     const products = [
+        // KUCHEN & SNACKS
         { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
         { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
         { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
-        { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
         { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
-        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
         { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
         { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
         { id: 9, name: "Gebr. Mandeln", price: 400, cat: "Kuchen" },
@@ -92,7 +87,20 @@
         { id: 11, name: "イチゴショコラ", price: 400, cat: "Kuchen" },
         { id: 12, name: "オレンジショコラ", price: 400, cat: "Kuchen" },
         { id: 13, name: "Schokokuchen", price: 400, cat: "Kuchen" },
-        { id: 14, name: "Orangette", price: 450, cat: "Kuchen" }
+        { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
+
+        // GETRÄNKE
+        { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
+        { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke" },
+        { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke" },
+        { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke" },
+        { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke" },
+        { id: 19, name: "Hot Choko", price: 700, cat: "Getränke" },
+        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
+        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
+        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
+        { id: 23, name: "Carpis", price: 300, cat: "Getränke" }
     ];
 
     let cart = {};
@@ -111,7 +119,8 @@
         div.innerHTML = '';
         products
             .filter(p => p.cat === currentCat)
-            .sort((a,b) => a.name.localeCompare(b.name))
+            // SORTIERUNG NACH PREIS (p.price)
+            .sort((a, b) => a.price - b.price) 
             .forEach(p => {
                 const c = document.createElement('div');
                 c.className = 'card';
@@ -169,4 +178,6 @@
 </script>
 </body>
 </html>
+
+
 
