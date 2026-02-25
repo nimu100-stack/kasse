@@ -8,20 +8,19 @@
         :root { --accent: #2e7d32; --warn: #d32f2f; }
         body { font-family: sans-serif; margin: 0; padding: 10px; background: #f0f0f0; }
         
-        h2 { text-align: center; color: #5d4037; margin-bottom: 10px; }
-
-        /* Kachel-Layout */
+        /* Kachel-Layout (Überschrift gelöscht für mehr Platz) */
         #menu { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
             gap: 10px; 
-            margin-bottom: 280px; /* Platz für Kasse unten */
+            margin-bottom: 280px; 
+            padding-top: 5px;
         }
 
         .card { 
             background: white; border: none; padding: 15px 5px; text-align: center; 
             border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; justify-content: center; min-height: 90px;
+            display: flex; flex-direction: column; justify-content: center; min-height: 95px;
             cursor: pointer;
         }
         .card:active { background: #e0e0e0; transform: scale(0.95); }
@@ -33,9 +32,9 @@
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: white; border-top: 3px solid #333; padding: 15px; 
             box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
         }
 
-        /* Warenkorb-Liste im Kasten */
         #cart { 
             max-height: 100px; overflow-y: auto; 
             margin-bottom: 10px; border-bottom: 1px solid #eee;
@@ -44,21 +43,21 @@
             display: flex; justify-content: space-between; 
             padding: 8px 0; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9;
         }
-        .delete-hint { font-size: 0.7rem; color: #999; text-align: right; }
+        .delete-hint { font-size: 0.7rem; color: #999; text-align: right; margin-bottom: 5px; }
 
         .row { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
         .total { font-size: 1.8rem; font-weight: bold; }
-        input { width: 100px; font-size: 1.3rem; padding: 5px; text-align: right; border: 1px solid #ccc; }
+        input { width: 100px; font-size: 1.3rem; padding: 5px; text-align: right; border: 1px solid #ccc; border-radius: 4px; }
         
         button.reset { 
             width: 100%; background: var(--warn); color: white; border: none; 
             padding: 12px; font-weight: bold; border-radius: 5px; margin-top: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h2>Kuchentheke</h2>
     <div id="menu"></div>
 
     <div id="checkout-bar">
@@ -111,7 +110,6 @@
         update();
     }
 
-    // EINZELNE POSTEN LÖSCHEN
     function remove(id) {
         if(cart[id].qty > 1) cart[id].qty--;
         else delete cart[id];
@@ -128,7 +126,7 @@
             const r = document.createElement('div');
             r.className = 'cart-item';
             r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
-            r.onclick = () => remove(id); // Klick löscht den Artikel
+            r.onclick = () => remove(id);
             cDiv.appendChild(r);
         }
         document.getElementById('total-val').innerText = total;
