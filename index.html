@@ -1,156 +1,30 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasse</title>
-    <style>
-        :root { --primary: #6d4c41; --accent: #2e7d32; --bg: #f4f4f4; --warn: #d32f2f; }
-        
-        * { box-sizing: border-box; }
-
-        body { 
-            margin: 0; font-family: sans-serif; background: var(--bg);
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-        }
-
-        /* Obere Hälfte: Artikel (Scrollbar) */
-        #menu { 
-            flex: 1; 
-            overflow-y: auto; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-            gap: 10px; 
-            padding: 15px;
-            align-content: start;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .card { 
-            background: white; border-radius: 8px; padding: 15px 5px; text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; min-height: 90px;
-            display: flex; flex-direction: column; justify-content: center;
-        }
-        .card:active { background: #eee; transform: scale(0.95); }
-        .card strong { display: block; margin-bottom: 5px; font-size: 0.9rem; }
-        .card span { color: var(--accent); font-weight: bold; }
-
-        /* Untere Hälfte: Warenkorb & Kasse */
-        #checkout { 
-            height: 40%; background: white; border-top: 2px solid #ccc;
-            display: flex; flex-direction: column; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        }
-
-        #cart { flex: 1; overflow-y: auto; padding: 10px; }
-        .cart-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-
-        .summary { padding: 15px; background: #eee; }
-        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .total { font-size: 1.8rem; font-weight: bold; }
-        .input-pay { width: 100px; font-size: 1.2rem; padding: 5px; text-align: right; }
-        
-        button.reset { 
-            width: 100%; background: var(--warn); color: white; border: none; 
-            padding: 12px; font-weight: bold; border-radius: 5px; cursor: pointer;
-        }
-
-        /* Desktop-Optimierung */
-        @media (min-width: 800px) {
-            body { flex-direction: row; }
-            #menu { flex: 2; height: 100vh; }
-            #checkout { width: 350px; height: 100vh; border-top: none; border-left: 2px solid #ccc; }
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST</title>
 </head>
 <body>
-
-<div id="menu"></div>
-
-<div id="checkout">
-    <div id="cart"></div>
-    <div class="summary">
-        <div class="row">
-            <strong>GESAMT:</strong>
-            <span class="total"><span id="total-val">0</span> ¥</span>
-        </div>
-        <div class="row">
-            <span>Gegeben:</span>
-            <input type="number" id="cash" class="input-pay" oninput="calc()">
-        </div>
-        <div class="row">
-            <span>Rückgeld:</span>
-            <strong id="change" style="color:var(--accent); font-size:1.5rem;">0 ¥</strong>
-        </div>
-        <button class="reset" onclick="clr()">RESET</button>
+    <h1>KASSEN-TEST</h1>
+    <p>Wenn du das hier lesen kannst und scrollen kannst, funktioniert es!</p>
+    
+    <div id="produkte">
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 1</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 2</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 3</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 4</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 5</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 6</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 7</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 8</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 9</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 10</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 11</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 12</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 13</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 14</button>
+        <button onclick="alert('OK')" style="display:block; width:100%; padding:20px; margin:10px 0;">Knopf 15</button>
     </div>
-</div>
-
-<script>
-    // HIER DEINE PRODUKTE EINPFLEGEN
-    const products = [
-        { id: 1, name: "Linzertorte", price: 400 },
-        { id: 2, name: "Nusstorte", price: 550 },
-        { id: 3, name: "Apfelstrudel", price: 500 },
-        { id: 4, name: "Kaffee", price: 500 },
-        { id: 5, name: "Cantuccini", price: 250 },
-        { id: 6, name: "MomoEis", price: 700 }
-        // Einfach hier weitere Zeilen hinzufügen...
-    ];
-
-    let cart = {};
-    let total = 0;
-
-    function renderMenu() {
-        const div = document.getElementById('menu');
-        products.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'card';
-            c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
-            c.onclick = () => add(p);
-            div.appendChild(c);
-        });
-    }
-
-    function add(p) {
-        if(cart[p.id]) cart[p.id].qty++;
-        else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
-        update();
-    }
-
-    function update() {
-        const cDiv = document.getElementById('cart');
-        cDiv.innerHTML = '';
-        total = 0;
-        for(let id in cart) {
-            const item = cart[id];
-            total += item.price * item.qty;
-            const r = document.createElement('div');
-            r.className = 'cart-row';
-            r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
-            r.onclick = () => { if(cart[id].qty > 1) cart[id].qty--; else delete cart[id]; update(); };
-            cDiv.appendChild(r);
-        }
-        document.getElementById('total-val').innerText = total;
-        calc();
-    }
-
-    function calc() {
-        const cash = document.getElementById('cash').value;
-        const out = document.getElementById('change');
-        if(!cash || cash == 0) out.innerText = "0 ¥";
-        else out.innerText = (cash - total) + " ¥";
-    }
-
-    function clr() {
-        if(confirm("Löschen?")) {
-            cart = {};
-            document.getElementById('cash').value = '';
-            update();
-        }
-    }
-
-    renderMenu();
-</script>
 </body>
 </html>
-
