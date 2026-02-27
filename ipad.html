@@ -3,27 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasse Profi</title>
+    <title>Kasse IPAD Edition</title>
     <style>
-        :root { --accent: #2e7d32; --warn: #b71c1c; --brown-dark: #3e2723; --brown-light: #8d6e63; --stats: #1976d2; }
-        body { font-family: sans-serif; margin: 0; padding: 0; background: #dcdcdc; display: flex; height: 100vh; overflow: hidden; }
+        :root { --accent: #2e7d32; --warn: #b71c1c; --brown-dark: #3e2723; --stats: #1976d2; }
+        body { 
+            font-family: sans-serif; margin: 0; padding: 0; background: #dcdcdc; 
+            display: flex; height: 100vh; overflow: hidden; 
+        }
         
-        .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #999; background: #f0f0f0; }
-        .right-panel { width: 350px; background: white; display: flex; flex-direction: column; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 10; }
+        .left-panel { 
+            flex: 1; display: flex; flex-direction: column; border-right: 2px solid #999; 
+            background: #f0f0f0;
+        }
+        
+        .right-panel { 
+            width: 350px; background: white; display: flex; flex-direction: column; 
+            padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 10;
+        }
 
-        /* TAB LOGIK UMGEKEHRT */
-        .tabs { display: flex; background: #ccc; flex-shrink: 0; }
-        .tab { flex: 1; padding: 20px; text-align: center; color: #555; font-weight: bold; cursor: pointer; font-size: 1.2rem; background: #bbb; border-bottom: 5px solid transparent; }
-        
-        /* Der jeweils ANDERE Tab soll dunkelbraun sein, wenn eine Kategorie aktiv ist */
+        /* TAB LOGIK */
+        .tabs { display: flex; background: #bbb; flex-shrink: 0; }
+        .tab { flex: 1; padding: 20px; text-align: center; color: #555; font-weight: bold; cursor: pointer; font-size: 1.2rem; border-bottom: 5px solid transparent; }
         .tab.highlight { background: var(--brown-dark); color: white; border-bottom: 5px solid #fff; }
 
-        #menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; flex-grow: 1; }
+        #menu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 15px; padding: 20px; overflow-y: auto; flex-grow: 1;
+        }
 
         .card { 
             background: white; border: 1px solid #aaa; padding: 15px 5px; text-align: center; 
             border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; justify-content: center; aspect-ratio: 1/1; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; 
+            aspect-ratio: 1/1; cursor: pointer;
         }
         .card:active { background: #bbb; transform: scale(0.98); }
         .card strong { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; color: #000; line-height: 1.2; }
@@ -31,9 +44,12 @@
 
         #cart { flex-grow: 1; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #f5f5f5; }
+        
         .total-row { font-size: 2.5rem; font-weight: 900; display: flex; justify-content: space-between; margin: 15px 0; }
         input { width: 130px; font-size: 1.8rem; padding: 10px; text-align: right; border: 2px solid #333; border-radius: 8px; font-weight: bold; }
+        
         .change-row { font-size: 2rem; color: var(--accent); font-weight: bold; text-align: right; margin-bottom: 20px; }
+
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
         button { border: none; padding: 20px; font-weight: bold; border-radius: 12px; cursor: pointer; font-size: 1.3rem; }
         .reset { background: var(--warn); color: white; }
@@ -69,7 +85,7 @@
     </div>
 
     <div id="stats-overlay">
-        <h2>📊 Tagesstatistik</h2>
+        <h2>📊 Tagesstatistik (iPad)</h2>
         <div id="stats-summary" style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 20px; font-size: 1.3rem;"></div>
         <h3>Verkaufte Artikel:</h3>
         <div id="stats-items"></div>
@@ -87,11 +103,10 @@
         { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
         { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
         { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
-        { id: 13, name: "Schokokuchen", price: 450, cat: "Kuchen" },
+        { id: 13, name: "Schoko", price: 450, cat: "Kuchen" }, // Name gekürzt
         { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
         { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
         
-        // GETRÄNKE (Alkoholfrei zuerst)
         { id: 4, name: "Kaffee", price: 500, cat: "Getränke", alc: false },
         { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke", alc: false },
         { id: 20, name: "Tee", price: 500, cat: "Getränke", alc: false },
@@ -105,7 +120,6 @@
         { id: 19, name: "Hot Choko", price: 700, cat: "Getränke", alc: false },
         { id: 6, name: "MomoEis", price: 700, cat: "Getränke", alc: false },
         
-        // ALKOHOL (Am Ende)
         { id: 26, name: "Highball", price: 600, cat: "Getränke", alc: true },
         { id: 27, name: "Radler", price: 600, cat: "Getränke", alc: true },
         { id: 28, name: "Glühwein", price: 600, cat: "Getränke", alc: true },
@@ -119,33 +133,25 @@
 
     function switchTab(cat) {
         currentCat = cat;
-        
-        // Tab-Styling umkehren wie gewünscht
         const tk = document.getElementById('tabKuchen');
         const tg = document.getElementById('tabGetraenke');
-        
         if(cat === 'Kuchen') {
             tk.classList.remove('highlight');
-            tg.classList.add('highlight'); // Getränke-Balken wird dunkelbraun, wenn Kuchen aktiv sind
+            tg.classList.add('highlight');
         } else {
             tg.classList.remove('highlight');
-            tk.classList.add('highlight'); // Kuchen-Balken wird dunkelbraun, wenn Getränke aktiv sind
+            tk.classList.add('highlight');
         }
-        
         renderMenu();
     }
 
     function renderMenu() {
         const div = document.getElementById('menu');
         div.innerHTML = '';
-        
         let filtered = products.filter(p => p.cat === currentCat);
-        
-        // Bei Getränken: erst alkoholfrei, dann alkohol
         if(currentCat === 'Getränke') {
             filtered.sort((a, b) => (a.alc === b.alc) ? 0 : a.alc ? 1 : -1);
         }
-
         filtered.forEach(p => {
             const c = document.createElement('div');
             c.className = 'card';
@@ -155,7 +161,6 @@
         });
     }
 
-    // [Restliche Funktionen identisch]
     function add(p) {
         if(cart[p.id]) cart[p.id].qty++;
         else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
@@ -191,7 +196,7 @@
 
     function completeSale() {
         if (total <= 0) return;
-        if(confirm("Verkauf abschließen?")) {
+        if(confirm("Verkauf speichern?")) {
             let history = JSON.parse(localStorage.getItem('sales_history') || '[]');
             history.push({ timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) });
             localStorage.setItem('sales_history', JSON.stringify(history));
@@ -221,7 +226,6 @@
     function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
     function clearStats() { if(confirm("Daten löschen?")) { localStorage.removeItem('sales_history'); showStats(); } }
 
-    // Start-Zustand setzen
     switchTab('Kuchen');
 </script>
 </body>
