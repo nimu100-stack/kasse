@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasse Profi-Modus</title>
+    <title>Kasse Smartphone</title>
     <style>
         :root { --accent: #2e7d32; --warn: #b71c1c; --brown: #3e2723; --stats: #1976d2; }
         body { font-family: sans-serif; margin: 0; padding: 0; background: #e0e0e0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
@@ -46,12 +46,8 @@
         .reset { flex: 2; background: var(--warn); color: white; }
         .stats-btn { flex: 1; background: var(--stats); color: white; }
 
-        /* Overlay für Statistik */
-        #stats-overlay { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: white; z-index: 200; display: none; padding: 20px; overflow-y: auto;
-        }
-        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 5px 0; }
+        #stats-overlay { position: fixed; inset: 0; background: white; z-index: 200; display: none; padding: 20px; overflow-y: auto; }
+        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; }
     </style>
 </head>
 <body>
@@ -90,33 +86,40 @@
         <div id="stats-items"></div>
         <hr style="margin-top: 30px;">
         <button onclick="closeStats()" style="background: #333; color: white; width: 100%; margin-bottom: 10px;">SCHLIESSEN</button>
-        <button onclick="clearStats()" style="background: #eee; color: red; width: 100%; padding: 8px; font-size: 0.8rem;">Alle Daten löschen (neuer Tag)</button>
+        <button onclick="clearStats()" style="background: #eee; color: red; width: 100%; padding: 8px; font-size: 0.8rem;">Alle Daten löschen</button>
     </div>
 
 <script>
     const products = [
+        // KUCHEN
         { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
         { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
         { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
         { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
         { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
         { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
-        { id: 9, name: "Gebr. Mandeln", price: 400, cat: "Kuchen" },
+        { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
         { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
-        { id: 11, name: "イチゴショコラ", price: 400, cat: "Kuchen" },
-        { id: 12, name: "オレンジショコラ", price: 400, cat: "Kuchen" },
-        { id: 13, name: "Schokokuchen", price: 400, cat: "Kuchen" },
+        { id: 13, name: "Schokokuchen", price: 450, cat: "Kuchen" },
         { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
+        { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
+        // GETRÄNKE
         { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
-        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
+        { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke" },
+        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
+        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
         { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke" },
+        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
+        { id: 26, name: "Highball", price: 600, cat: "Getränke" },
+        { id: 27, name: "Radler", price: 600, cat: "Getränke" },
+        { id: 28, name: "Glühwein", price: 600, cat: "Getränke" },
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
         { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke" },
         { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke" },
         { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke" },
         { id: 19, name: "Hot Choko", price: 700, cat: "Getränke" },
-        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
-        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
-        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
+        { id: 29, name: "Bier", price: 700, cat: "Getränke" },
+        { id: 30, name: "Schnaps", price: 700, cat: "Getränke" },
         { id: 23, name: "Carpis", price: 300, cat: "Getränke" }
     ];
 
@@ -181,11 +184,7 @@
     function completeSale() {
         if (total <= 0) return;
         if(confirm("Verkauf speichern?")) {
-            const sale = {
-                timestamp: new Date().toISOString(),
-                amount: total,
-                items: JSON.parse(JSON.stringify(cart))
-            };
+            const sale = { timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) };
             let history = JSON.parse(localStorage.getItem('sales_history') || '[]');
             history.push(sale);
             localStorage.setItem('sales_history', JSON.stringify(history));
@@ -198,50 +197,28 @@
     function showStats() {
         const history = JSON.parse(localStorage.getItem('sales_history') || '[]');
         const today = new Date().toISOString().split('T')[0];
-        
-        let dailyTotal = 0;
-        let count = 0;
-        let itemStats = {};
-
+        let dailyTotal = 0, count = 0, itemStats = {};
         history.forEach(s => {
             if(s.timestamp.startsWith(today)) {
                 dailyTotal += s.amount;
                 count++;
-                // Artikel zählen
                 for(let id in s.items) {
                     let item = s.items[id];
-                    if(!itemStats[item.name]) itemStats[item.name] = 0;
-                    itemStats[item.name] += item.qty;
+                    itemStats[item.name] = (itemStats[item.name] || 0) + item.qty;
                 }
             }
         });
-
-        document.getElementById('stats-summary').innerHTML = `
-            <div class="stat-line"><span>Datum:</span> <strong>${today}</strong></div>
-            <div class="stat-line"><span>Kunden:</span> <strong>${count}</strong></div>
-            <div class="stat-line" style="font-size:1.4rem; color:var(--accent); margin-top:10px;">
-                <span>UMSATZ:</span> <strong>${dailyTotal} ¥</strong>
-            </div>
-        `;
-
+        document.getElementById('stats-summary').innerHTML = `Kunden: ${count} | <strong>Umsatz: ${dailyTotal} ¥</strong>`;
         let itemHTML = "";
-        const sortedItems = Object.entries(itemStats).sort((a,b) => b[1] - a[1]);
-        sortedItems.forEach(([name, qty]) => {
+        Object.entries(itemStats).sort((a,b) => b[1] - a[1]).forEach(([name, qty]) => {
             itemHTML += `<div class="stat-line"><span>${name}</span> <strong>${qty}x</strong></div>`;
         });
-        document.getElementById('stats-items').innerHTML = itemHTML || "Noch keine Verkäufe heute.";
-        
+        document.getElementById('stats-items').innerHTML = itemHTML || "Keine Verkäufe heute.";
         document.getElementById('stats-overlay').style.display = 'block';
     }
 
     function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
-    
-    function clearStats() {
-        if(confirm("ACHTUNG: Möchtest du wirklich alle gespeicherten Verkäufe löschen?")) {
-            localStorage.removeItem('sales_history');
-            showStats();
-        }
-    }
+    function clearStats() { if(confirm("Daten löschen?")) { localStorage.removeItem('sales_history'); showStats(); } }
 
     renderMenu();
 </script>
