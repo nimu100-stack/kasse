@@ -11,13 +11,11 @@
             display: flex; height: 100vh; overflow: hidden; 
         }
         
-        /* Linke Seite: Menü */
         .left-panel { 
             flex: 1; display: flex; flex-direction: column; border-right: 2px solid #999; 
             background: #f0f0f0;
         }
         
-        /* Rechte Seite: Kasse */
         .right-panel { 
             width: 350px; background: white; display: flex; flex-direction: column; 
             padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 10;
@@ -43,7 +41,6 @@
         .card strong { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; color: #000; line-height: 1.2; }
         .card span { color: var(--accent); font-weight: bold; font-size: 1rem; }
 
-        /* Kassen-Elemente rechts */
         #cart { flex-grow: 1; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #f5f5f5; }
         
@@ -106,30 +103,36 @@
     </div>
 
 <script>
-    // [Die Logik bleibt identisch zur Handy-Version, nur die Darstellung ändert sich]
     const products = [
+        // KUCHEN
         { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
         { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
         { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
         { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
         { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
         { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
-        { id: 9, name: "Gebr. Mandeln", price: 400, cat: "Kuchen" },
+        { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
         { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
-        { id: 11, name: "イチゴショコラ", price: 400, cat: "Kuchen" },
-        { id: 12, name: "オレンジショコラ", price: 400, cat: "Kuchen" },
-        { id: 13, name: "Schokokuchen", price: 400, cat: "Kuchen" },
+        { id: 13, name: "Schokokuchen", price: 450, cat: "Kuchen" },
         { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
+        { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
+        // GETRÄNKE
         { id: 4, name: "Kaffee", price: 500, cat: "Getränke" },
-        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
+        { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke" },
+        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
+        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
         { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke" },
+        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
+        { id: 26, name: "Highball", price: 600, cat: "Getränke" },
+        { id: 27, name: "Radler", price: 600, cat: "Getränke" },
+        { id: 28, name: "Glühwein", price: 600, cat: "Getränke" },
+        { id: 6, name: "MomoEis", price: 700, cat: "Getränke" },
         { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke" },
         { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke" },
         { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke" },
         { id: 19, name: "Hot Choko", price: 700, cat: "Getränke" },
-        { id: 20, name: "Tee", price: 500, cat: "Getränke" },
-        { id: 21, name: "TeeOle", price: 550, cat: "Getränke" },
-        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke" },
+        { id: 29, name: "Bier", price: 700, cat: "Getränke" },
+        { id: 30, name: "Schnaps", price: 700, cat: "Getränke" },
         { id: 23, name: "Carpis", price: 300, cat: "Getränke" }
     ];
 
