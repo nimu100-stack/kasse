@@ -7,222 +7,132 @@
     <style>
         :root { --accent: #2e7d32; --warn: #b71c1c; --brown-dark: #3e2723; --stats: #1976d2; }
         body { font-family: sans-serif; margin: 0; padding: 0; background: #e0e0e0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* TAB LOGIK */
         .tabs { display: flex; background: #bbb; position: sticky; top: 0; z-index: 110; flex-shrink: 0; }
-        .tab { flex: 1; padding: 15px; text-align: center; color: #555; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .tab { flex: 1; padding: 15px; text-align: center; color: #555; font-weight: bold; cursor: pointer; }
         .tab.highlight { background: var(--brown-dark); color: white; border-bottom: 5px solid #fff; }
-
-        #menu { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
-            gap: 10px; padding: 12px; padding-bottom: 380px; 
-            overflow-y: auto; flex-grow: 1; -webkit-overflow-scrolling: touch;
-        }
-
-        .card { 
-            background: white; border: 1px solid #999; padding: 12px 4px; text-align: center; 
-            border-radius: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-            display: flex; flex-direction: column; justify-content: center; min-height: 85px;
-        }
-        .card:active { background: #bbb; }
-        .card strong { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #000; line-height: 1.1; }
-        .card span { color: var(--accent); font-weight: bold; font-size: 0.95rem; }
-
-        #checkout-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: white; border-top: 4px solid #000; padding: 15px; 
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 100;
-        }
-
-        #cart { max-height: 110px; overflow-y: auto; margin-bottom: 10px; border-bottom: 2px solid #eee; }
-        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
-
-        .row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
-        .total { font-size: 2rem; font-weight: 900; color: #000; }
-        input { width: 100px; font-size: 1.4rem; padding: 8px; text-align: right; border: 2px solid #333; border-radius: 5px; font-weight: bold; }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { border: none; padding: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
-        .reset { flex: 2; background: var(--warn); color: white; }
-        .stats-btn { flex: 1; background: var(--stats); color: white; }
-
+        #menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 12px; padding-bottom: 380px; overflow-y: auto; flex-grow: 1; }
+        .card { background: white; border: 1px solid #999; padding: 12px 4px; text-align: center; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; min-height: 85px; }
+        .card strong { font-size: 0.95rem; font-weight: 900; color: #000; }
+        .card span { color: var(--accent); font-weight: bold; font-size: 0.9rem; }
+        #checkout-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 4px solid #000; padding: 15px; z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.2); }
+        #cart { max-height: 100px; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 5px; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; }
+        input { width: 90px; font-size: 1.3rem; padding: 5px; text-align: right; border: 2px solid #333; font-weight: bold; }
+        .btn-group { display: flex; gap: 8px; margin-top: 8px; }
+        button { border: none; padding: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; flex: 1; }
+        .reset { background: var(--warn); color: white; flex: 2; }
+        .stats-btn { background: var(--stats); color: white; }
         #stats-overlay { position: fixed; inset: 0; background: white; z-index: 200; display: none; padding: 20px; overflow-y: auto; }
-        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; }
     </style>
 </head>
 <body>
-
     <div class="tabs">
         <div id="tabKuchen" class="tab" onclick="switchTab('Kuchen')">KUCHEN</div>
         <div id="tabGetraenke" class="tab" onclick="switchTab('Getränke')">GETRÄNKE</div>
     </div>
-
     <div id="menu"></div>
-
     <div id="checkout-bar">
         <div id="cart"></div>
-        <div class="row">
-            <strong>TOTAL:</strong>
-            <span class="total"><span id="total-val">0</span> ¥</span>
-        </div>
-        <div class="row">
-            <span>Gegeben:</span>
-            <input type="number" id="cash" placeholder="0" oninput="calc()">
-        </div>
-        <div class="row">
-            <span>Rückgeld:</span>
-            <strong id="change" style="color:var(--accent); font-size:1.8rem;">0 ¥</strong>
-        </div>
+        <div class="row"><strong>TOTAL:</strong><span style="font-size:1.8rem; font-weight:900;"><span id="total-val">0</span> ¥</span></div>
+        <div class="row"><span>Gegeben:</span><input type="number" id="cash" placeholder="0" oninput="calc()"></div>
+        <div class="row"><span>Rückgeld:</span><strong id="change" style="color:var(--accent); font-size:1.5rem;">0 ¥</strong></div>
         <div class="btn-group">
             <button class="stats-btn" onclick="showStats()">📊</button>
-            <button class="reset" onclick="completeSale()">NÄCHSTER KUNDE</button>
+            <button class="reset" onclick="completeSale()">ABSCHLIESSEN</button>
         </div>
     </div>
-
     <div id="stats-overlay">
-        <h2>📊 Tagesstatistik</h2>
-        <div id="stats-summary" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-        <h3>Verkaufte Artikel:</h3>
+        <h2>📊 Statistik</h2>
+        <div id="stats-summary" style="background:#f9f9f9; padding:15px; border-radius:8px;"></div>
         <div id="stats-items"></div>
-        <button onclick="closeStats()" style="background: #333; color: white; width: 100%; margin-top: 30px; padding: 15px;">SCHLIESSEN</button>
-        <button onclick="clearStats()" style="background: #eee; color: red; width: 100%; margin-top: 20px; padding: 10px; font-size: 0.8rem;">Daten löschen</button>
+        <button onclick="closeStats()" style="background:#333; color:white; width:100%; margin-top:20px; padding:15px;">ZURÜCK</button>
     </div>
+    <script>
+        const products = [
+            { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
+            { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
+            { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
+            { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
+            { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
+            { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
+            { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
+            { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
+            { id: 13, name: "Schoko", price: 450, cat: "Kuchen" },
+            { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
+            { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
+            { id: 4, name: "Kaffee", price: 500, cat: "Getränke", alc: false },
+            { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke", alc: false },
+            { id: 20, name: "Tee", price: 500, cat: "Getränke", alc: false },
+            { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke", alc: false },
+            { id: 23, name: "Carpis", price: 300, cat: "Getränke", alc: false },
+            { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke", alc: false },
+            { id: 21, name: "TeeOle", price: 550, cat: "Getränke", alc: false },
+            { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke", alc: false },
+            { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke", alc: false },
+            { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke", alc: false },
+            { id: 19, name: "Hot Choko", price: 700, cat: "Getränke", alc: false },
+            { id: 6, name: "MomoEis", price: 700, cat: "Getränke", alc: false },
+            { id: 26, name: "Highball", price: 600, cat: "Getränke", alc: true },
+            { id: 27, name: "Radler", price: 600, cat: "Getränke", alc: true },
+            { id: 28, name: "Glühwein", price: 600, cat: "Getränke", alc: true },
+            { id: 29, name: "Bier", price: 700, cat: "Getränke", alc: true },
+            { id: 30, name: "Schnaps", price: 700, cat: "Getränke", alc: true }
+        ];
 
-<script>
-    const products = [
-        { id: 1, name: "Linzertorte", price: 400, cat: "Kuchen" },
-        { id: 2, name: "Nusstorte", price: 550, cat: "Kuchen" },
-        { id: 3, name: "Apfelstrudel", price: 500, cat: "Kuchen" },
-        { id: 5, name: "Cantuccini", price: 250, cat: "Kuchen" },
-        { id: 7, name: "Müsliriegel", price: 350, cat: "Kuchen" },
-        { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
-        { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
-        { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
-        { id: 13, name: "Schoko", price: 450, cat: "Kuchen" },
-        { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
-        { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
-        
-        { id: 4, name: "Kaffee", price: 500, cat: "Getränke", alc: false },
-        { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke", alc: false },
-        { id: 20, name: "Tee", price: 500, cat: "Getränke", alc: false },
-        { id: 22, name: "Lemon Soda", price: 500, cat: "Getränke", alc: false },
-        { id: 23, name: "Carpis", price: 300, cat: "Getränke", alc: false },
-        { id: 15, name: "KaffeeOle", price: 550, cat: "Getränke", alc: false },
-        { id: 21, name: "TeeOle", price: 550, cat: "Getränke", alc: false },
-        { id: 16, name: "Lemon coffee", price: 700, cat: "Getränke", alc: false },
-        { id: 17, name: "Tonic coffee", price: 700, cat: "Getränke", alc: false },
-        { id: 18, name: "Kaffee Mocca", price: 700, cat: "Getränke", alc: false },
-        { id: 19, name: "Hot Choko", price: 700, cat: "Getränke", alc: false },
-        { id: 6, name: "MomoEis", price: 700, cat: "Getränke", alc: false },
-        
-        { id: 26, name: "Highball", price: 600, cat: "Getränke", alc: true },
-        { id: 27, name: "Radler", price: 600, cat: "Getränke", alc: true },
-        { id: 28, name: "Glühwein", price: 600, cat: "Getränke", alc: true },
-        { id: 29, name: "Bier", price: 700, cat: "Getränke", alc: true },
-        { id: 30, name: "Schnaps", price: 700, cat: "Getränke", alc: true }
-    ];
-
-    let cart = {};
-    let total = 0;
-    let currentCat = "Kuchen";
-
-    function switchTab(cat) {
-        currentCat = cat;
-        const tk = document.getElementById('tabKuchen');
-        const tg = document.getElementById('tabGetraenke');
-        if(cat === 'Kuchen') {
-            tk.classList.remove('highlight');
-            tg.classList.add('highlight');
-        } else {
-            tg.classList.remove('highlight');
-            tk.classList.add('highlight');
+        let cart = {}; let total = 0; let currentCat = "Kuchen";
+        function switchTab(cat) {
+            currentCat = cat;
+            const tk = document.getElementById('tabKuchen'); const tg = document.getElementById('tabGetraenke');
+            if(cat === 'Kuchen') { tk.classList.remove('highlight'); tg.classList.add('highlight'); }
+            else { tg.classList.remove('highlight'); tk.classList.add('highlight'); }
+            renderMenu();
         }
-        renderMenu();
-    }
-
-    function renderMenu() {
-        const div = document.getElementById('menu');
-        div.innerHTML = '';
-        let filtered = products.filter(p => p.cat === currentCat);
-        if(currentCat === 'Getränke') {
-            filtered.sort((a, b) => (a.alc === b.alc) ? 0 : a.alc ? 1 : -1);
+        function renderMenu() {
+            const div = document.getElementById('menu'); div.innerHTML = '';
+            let filtered = products.filter(p => p.cat === currentCat);
+            filtered.sort((a, b) => {
+                if (currentCat === 'Getränke' && a.alc !== b.alc) return a.alc ? 1 : -1;
+                return a.price - b.price;
+            });
+            filtered.forEach(p => {
+                const c = document.createElement('div'); c.className = 'card';
+                c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
+                c.onclick = () => add(p); div.appendChild(c);
+            });
         }
-        filtered.forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'card';
-            c.innerHTML = `<strong>${p.name}</strong><span>${p.price} ¥</span>`;
-            c.onclick = () => add(p);
-            div.appendChild(c);
-        });
-    }
-
-    function add(p) {
-        if(cart[p.id]) cart[p.id].qty++;
-        else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
-        update();
-    }
-
-    function remove(id) {
-        if(cart[id].qty > 1) cart[id].qty--;
-        else delete cart[id];
-        update();
-    }
-
-    function update() {
-        const cDiv = document.getElementById('cart');
-        cDiv.innerHTML = ''; total = 0;
-        for(let id in cart) {
-            const item = cart[id]; total += item.price * item.qty;
-            const r = document.createElement('div');
-            r.className = 'cart-item';
-            r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
-            r.onclick = () => remove(id);
-            cDiv.appendChild(r);
-        }
-        document.getElementById('total-val').innerText = total;
-        calc();
-    }
-
-    function calc() {
-        const cash = document.getElementById('cash').value;
-        const out = document.getElementById('change');
-        out.innerText = (cash && cash > 0) ? (cash - total) + " ¥" : "0 ¥";
-    }
-
-    function completeSale() {
-        if (total <= 0) return;
-        if(confirm("Verkauf speichern?")) {
-            let history = JSON.parse(localStorage.getItem('sales_history') || '[]');
-            history.push({ timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) });
-            localStorage.setItem('sales_history', JSON.stringify(history));
-            cart = {}; document.getElementById('cash').value = ''; update();
-        }
-    }
-
-    function showStats() {
-        const history = JSON.parse(localStorage.getItem('sales_history') || '[]');
-        const today = new Date().toISOString().split('T')[0];
-        let dailyTotal = 0, count = 0, itemStats = {};
-        history.forEach(s => {
-            if(s.timestamp.startsWith(today)) {
-                dailyTotal += s.amount; count++;
-                for(let id in s.items) { let item = s.items[id]; itemStats[item.name] = (itemStats[item.name] || 0) + item.qty; }
+        function add(p) { if(cart[p.id]) cart[p.id].qty++; else cart[p.id] = { name: p.name, price: p.price, qty: 1 }; update(); }
+        function remove(id) { if(cart[id].qty > 1) cart[id].qty--; else delete cart[id]; update(); }
+        function update() {
+            const cDiv = document.getElementById('cart'); cDiv.innerHTML = ''; total = 0;
+            for(let id in cart) {
+                const item = cart[id]; total += item.price * item.qty;
+                const r = document.createElement('div'); r.className = 'cart-item';
+                r.innerHTML = `<span>${item.qty}x ${item.name}</span><span>${item.price * item.qty} ¥</span>`;
+                r.onclick = () => remove(id); cDiv.appendChild(r);
             }
-        });
-        document.getElementById('stats-summary').innerHTML = `Kunden: ${count} | <strong>Umsatz: ${dailyTotal} ¥</strong>`;
-        let itemHTML = "";
-        Object.entries(itemStats).sort((a,b) => b[1] - a[1]).forEach(([name, qty]) => {
-            itemHTML += `<div class="stat-line"><span>${name}</span> <strong>${qty}x</strong></div>`;
-        });
-        document.getElementById('stats-items').innerHTML = itemHTML || "Keine Verkäufe.";
-        document.getElementById('stats-overlay').style.display = 'block';
-    }
-
-    function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
-    function clearStats() { if(confirm("Daten löschen?")) { localStorage.removeItem('sales_history'); showStats(); } }
-
-    switchTab('Kuchen');
-</script>
+            document.getElementById('total-val').innerText = total; calc();
+        }
+        function calc() { const cash = document.getElementById('cash').value; document.getElementById('change').innerText = (cash && cash > 0) ? (cash - total) + " ¥" : "0 ¥"; }
+        function completeSale() {
+            if (total <= 0) return;
+            if(confirm("Speichern?")) {
+                let h = JSON.parse(localStorage.getItem('sales_history') || '[]');
+                h.push({ timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) });
+                localStorage.setItem('sales_history', JSON.stringify(h));
+                cart = {}; document.getElementById('cash').value = ''; update();
+            }
+        }
+        function showStats() {
+            const h = JSON.parse(localStorage.getItem('sales_history') || '[]'); const today = new Date().toISOString().split('T')[0];
+            let dailyTotal = 0, count = 0, itemStats = {};
+            h.forEach(s => { if(s.timestamp.startsWith(today)) { dailyTotal += s.amount; count++; for(let id in s.items) { let item = s.items[id]; itemStats[item.name] = (itemStats[item.name] || 0) + item.qty; } } });
+            document.getElementById('stats-summary').innerHTML = `Kunden: ${count} | Umsatz: ${dailyTotal} ¥`;
+            let itemHTML = ""; Object.entries(itemStats).sort((a,b) => b[1] - a[1]).forEach(([name, qty]) => { itemHTML += `<div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee;"><span>${name}</span> <strong>${qty}x</strong></div>`; });
+            document.getElementById('stats-items').innerHTML = itemHTML || "Keine Verkäufe."; document.getElementById('stats-overlay').style.display = 'block';
+        }
+        function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
+        switchTab('Kuchen');
+    </script>
 </body>
 </html>
