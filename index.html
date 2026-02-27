@@ -3,78 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kasse Profi</title>
+    <title>Kasse Smartphone</title>
     <style>
-        :root { --accent: #2e7d32; --warn: #b71c1c; --brown-dark: #3e2723; --brown-light: #8d6e63; --stats: #1976d2; }
-        body { font-family: sans-serif; margin: 0; padding: 0; background: #dcdcdc; display: flex; height: 100vh; overflow: hidden; }
+        :root { --accent: #2e7d32; --warn: #b71c1c; --brown-dark: #3e2723; --stats: #1976d2; }
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #e0e0e0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .left-panel { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #999; background: #f0f0f0; }
-        .right-panel { width: 350px; background: white; display: flex; flex-direction: column; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 10; }
-
-        /* TAB LOGIK UMGEKEHRT */
-        .tabs { display: flex; background: #ccc; flex-shrink: 0; }
-        .tab { flex: 1; padding: 20px; text-align: center; color: #555; font-weight: bold; cursor: pointer; font-size: 1.2rem; background: #bbb; border-bottom: 5px solid transparent; }
-        
-        /* Der jeweils ANDERE Tab soll dunkelbraun sein, wenn eine Kategorie aktiv ist */
+        /* TAB LOGIK */
+        .tabs { display: flex; background: #bbb; position: sticky; top: 0; z-index: 110; flex-shrink: 0; }
+        .tab { flex: 1; padding: 15px; text-align: center; color: #555; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         .tab.highlight { background: var(--brown-dark); color: white; border-bottom: 5px solid #fff; }
 
-        #menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; flex-grow: 1; }
+        #menu { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+            gap: 10px; padding: 12px; padding-bottom: 380px; 
+            overflow-y: auto; flex-grow: 1; -webkit-overflow-scrolling: touch;
+        }
 
         .card { 
-            background: white; border: 1px solid #aaa; padding: 15px 5px; text-align: center; 
-            border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column; justify-content: center; aspect-ratio: 1/1; cursor: pointer;
+            background: white; border: 1px solid #999; padding: 12px 4px; text-align: center; 
+            border-radius: 10px; box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; justify-content: center; min-height: 85px;
         }
-        .card:active { background: #bbb; transform: scale(0.98); }
-        .card strong { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; color: #000; line-height: 1.2; }
-        .card span { color: var(--accent); font-weight: bold; font-size: 1rem; }
+        .card:active { background: #bbb; }
+        .card strong { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #000; line-height: 1.1; }
+        .card span { color: var(--accent); font-weight: bold; font-size: 0.95rem; }
 
-        #cart { flex-grow: 1; overflow-y: auto; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-        .cart-item { display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #f5f5f5; }
-        .total-row { font-size: 2.5rem; font-weight: 900; display: flex; justify-content: space-between; margin: 15px 0; }
-        input { width: 130px; font-size: 1.8rem; padding: 10px; text-align: right; border: 2px solid #333; border-radius: 8px; font-weight: bold; }
-        .change-row { font-size: 2rem; color: var(--accent); font-weight: bold; text-align: right; margin-bottom: 20px; }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; }
-        button { border: none; padding: 20px; font-weight: bold; border-radius: 12px; cursor: pointer; font-size: 1.3rem; }
-        .reset { background: var(--warn); color: white; }
-        .stats-btn { background: var(--stats); color: white; }
+        #checkout-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: white; border-top: 4px solid #000; padding: 15px; 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 100;
+        }
 
-        #stats-overlay { position: fixed; inset: 0; background: white; z-index: 200; display: none; padding: 40px; overflow-y: auto; }
-        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; font-size: 1.2rem; }
+        #cart { max-height: 110px; overflow-y: auto; margin-bottom: 10px; border-bottom: 2px solid #eee; }
+        .cart-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid #f0f0f0; }
+
+        .row { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
+        .total { font-size: 2rem; font-weight: 900; color: #000; }
+        input { width: 100px; font-size: 1.4rem; padding: 8px; text-align: right; border: 2px solid #333; border-radius: 5px; font-weight: bold; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        button { border: none; padding: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+        .reset { flex: 2; background: var(--warn); color: white; }
+        .stats-btn { flex: 1; background: var(--stats); color: white; }
+
+        #stats-overlay { position: fixed; inset: 0; background: white; z-index: 200; display: none; padding: 20px; overflow-y: auto; }
+        .stat-line { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; }
     </style>
 </head>
 <body>
 
-    <div class="left-panel">
-        <div class="tabs">
-            <div id="tabKuchen" class="tab" onclick="switchTab('Kuchen')">KUCHEN</div>
-            <div id="tabGetraenke" class="tab" onclick="switchTab('Getränke')">GETRÄNKE</div>
-        </div>
-        <div id="menu"></div>
+    <div class="tabs">
+        <div id="tabKuchen" class="tab" onclick="switchTab('Kuchen')">KUCHEN</div>
+        <div id="tabGetraenke" class="tab" onclick="switchTab('Getränke')">GETRÄNKE</div>
     </div>
 
-    <div class="right-panel">
-        <h2 style="margin-top:0">Warenkorb</h2>
+    <div id="menu"></div>
+
+    <div id="checkout-bar">
         <div id="cart"></div>
-        <div class="total-row"><span>TOTAL:</span><span><span id="total-val">0</span> ¥</span></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:1.3rem;">
+        <div class="row">
+            <strong>TOTAL:</strong>
+            <span class="total"><span id="total-val">0</span> ¥</span>
+        </div>
+        <div class="row">
             <span>Gegeben:</span>
             <input type="number" id="cash" placeholder="0" oninput="calc()">
         </div>
-        <div class="change-row">Rückgeld: <span id="change">0 ¥</span></div>
+        <div class="row">
+            <span>Rückgeld:</span>
+            <strong id="change" style="color:var(--accent); font-size:1.8rem;">0 ¥</strong>
+        </div>
         <div class="btn-group">
+            <button class="stats-btn" onclick="showStats()">📊</button>
             <button class="reset" onclick="completeSale()">NÄCHSTER KUNDE</button>
-            <button class="stats-btn" onclick="showStats()">📊 TAGESSTATISTIK</button>
         </div>
     </div>
 
     <div id="stats-overlay">
         <h2>📊 Tagesstatistik</h2>
-        <div id="stats-summary" style="background: #f9f9f9; padding: 20px; border-radius: 12px; margin-bottom: 20px; font-size: 1.3rem;"></div>
+        <div id="stats-summary" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
         <h3>Verkaufte Artikel:</h3>
         <div id="stats-items"></div>
-        <button onclick="closeStats()" style="background: #333; color: white; width: 100%; margin-top: 40px; padding: 20px;">ZURÜCK</button>
-        <button onclick="clearStats()" style="background: transparent; color: red; width: 100%; margin-top: 20px; border: 1px solid red;">Daten löschen</button>
+        <button onclick="closeStats()" style="background: #333; color: white; width: 100%; margin-top: 30px; padding: 15px;">SCHLIESSEN</button>
+        <button onclick="clearStats()" style="background: #eee; color: red; width: 100%; margin-top: 20px; padding: 10px; font-size: 0.8rem;">Daten löschen</button>
     </div>
 
 <script>
@@ -87,11 +99,10 @@
         { id: 8, name: "Lebkuchen", price: 300, cat: "Kuchen" },
         { id: 9, name: "Gebr. Mandeln", price: 450, cat: "Kuchen" },
         { id: 10, name: "Cheesecake", price: 450, cat: "Kuchen" },
-        { id: 13, name: "Schokokuchen", price: 450, cat: "Kuchen" },
+        { id: 13, name: "Schoko", price: 450, cat: "Kuchen" },
         { id: 14, name: "Orangette", price: 450, cat: "Kuchen" },
         { id: 24, name: "Sando", price: 450, cat: "Kuchen" },
         
-        // GETRÄNKE (Alkoholfrei zuerst)
         { id: 4, name: "Kaffee", price: 500, cat: "Getränke", alc: false },
         { id: 25, name: "Hot Lemon", price: 500, cat: "Getränke", alc: false },
         { id: 20, name: "Tee", price: 500, cat: "Getränke", alc: false },
@@ -105,7 +116,6 @@
         { id: 19, name: "Hot Choko", price: 700, cat: "Getränke", alc: false },
         { id: 6, name: "MomoEis", price: 700, cat: "Getränke", alc: false },
         
-        // ALKOHOL (Am Ende)
         { id: 26, name: "Highball", price: 600, cat: "Getränke", alc: true },
         { id: 27, name: "Radler", price: 600, cat: "Getränke", alc: true },
         { id: 28, name: "Glühwein", price: 600, cat: "Getränke", alc: true },
@@ -119,33 +129,25 @@
 
     function switchTab(cat) {
         currentCat = cat;
-        
-        // Tab-Styling umkehren wie gewünscht
         const tk = document.getElementById('tabKuchen');
         const tg = document.getElementById('tabGetraenke');
-        
         if(cat === 'Kuchen') {
             tk.classList.remove('highlight');
-            tg.classList.add('highlight'); // Getränke-Balken wird dunkelbraun, wenn Kuchen aktiv sind
+            tg.classList.add('highlight');
         } else {
             tg.classList.remove('highlight');
-            tk.classList.add('highlight'); // Kuchen-Balken wird dunkelbraun, wenn Getränke aktiv sind
+            tk.classList.add('highlight');
         }
-        
         renderMenu();
     }
 
     function renderMenu() {
         const div = document.getElementById('menu');
         div.innerHTML = '';
-        
         let filtered = products.filter(p => p.cat === currentCat);
-        
-        // Bei Getränken: erst alkoholfrei, dann alkohol
         if(currentCat === 'Getränke') {
             filtered.sort((a, b) => (a.alc === b.alc) ? 0 : a.alc ? 1 : -1);
         }
-
         filtered.forEach(p => {
             const c = document.createElement('div');
             c.className = 'card';
@@ -155,7 +157,6 @@
         });
     }
 
-    // [Restliche Funktionen identisch]
     function add(p) {
         if(cart[p.id]) cart[p.id].qty++;
         else cart[p.id] = { name: p.name, price: p.price, qty: 1 };
@@ -191,7 +192,7 @@
 
     function completeSale() {
         if (total <= 0) return;
-        if(confirm("Verkauf abschließen?")) {
+        if(confirm("Verkauf speichern?")) {
             let history = JSON.parse(localStorage.getItem('sales_history') || '[]');
             history.push({ timestamp: new Date().toISOString(), amount: total, items: JSON.parse(JSON.stringify(cart)) });
             localStorage.setItem('sales_history', JSON.stringify(history));
@@ -221,7 +222,6 @@
     function closeStats() { document.getElementById('stats-overlay').style.display = 'none'; }
     function clearStats() { if(confirm("Daten löschen?")) { localStorage.removeItem('sales_history'); showStats(); } }
 
-    // Start-Zustand setzen
     switchTab('Kuchen');
 </script>
 </body>
